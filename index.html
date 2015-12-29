@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Go7 by wangfakang</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Go7</h1>
+        <p class="header">goroutine wait</p>
+
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/wangfakang/go7/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/wangfakang/go7/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/wangfakang/go7">View On GitHub</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/wangfakang">wangfakang</a></p>
+
+
+      </header>
+      <section>
+        <p><code>golang多协成的wait操作管理</code>  </p>
+
+<h1>
+<a id="waitgroup的用途" class="anchor" href="#waitgroup%E7%9A%84%E7%94%A8%E9%80%94" aria-hidden="true"><span class="octicon octicon-link"></span></a>WaitGroup的用途：</h1>
+
+<p>它能够一直等到所有的goroutine执行完成，并且阻塞主线程的执行，直到所有的goroutine执行完成。</p>
+
+<p>WaitGroup总共有三个方法：    </p>
+
+<ul>
+<li>Add(delta int):添加或者减少等待goroutine的数量.<br>
+</li>
+<li>Done():减少一个协成等待,相当于Add(-1).<br>
+</li>
+<li>Wait():执行阻塞，等待所有的协成执行完成.<br>
+</li>
+</ul>
+
+<h1>
+<a id="实列" class="anchor" href="#%E5%AE%9E%E5%88%97" aria-hidden="true"><span class="octicon octicon-link"></span></a>实列:</h1>
+
+<div class="highlight highlight-source-c"><pre>package main
+
+<span class="pl-en">import</span> (
+    <span class="pl-s"><span class="pl-pds">"</span>fmt<span class="pl-pds">"</span></span>
+    <span class="pl-s"><span class="pl-pds">"</span>sync<span class="pl-pds">"</span></span>
+    <span class="pl-s"><span class="pl-pds">"</span>time<span class="pl-pds">"</span></span>
+)
+
+func main() {
+    var wg <span class="pl-c1">sync</span>.<span class="pl-smi">WaitGroup</span>
+
+    <span class="pl-k">for</span> i := <span class="pl-c1">0</span>; i &lt; <span class="pl-c1">5</span>; i = i + <span class="pl-c1">1</span> {
+        wg.<span class="pl-c1">Add</span>(<span class="pl-c1">1</span>)
+        go <span class="pl-smi">func</span>(n <span class="pl-k">int</span>) {
+            <span class="pl-c">// defer wg.Done()</span>
+            defer wg.<span class="pl-c1">Add</span>(-<span class="pl-c1">1</span>)
+            <span class="pl-c1">mygoroutine</span>(n)
+        }(i)
+    }
+
+    wg.<span class="pl-c1">Wait</span>()
+}
+
+func <span class="pl-en">mygoroutine</span>(i <span class="pl-k">int</span>) {
+    <span class="pl-c1">time</span>.<span class="pl-c1">Sleep</span>(<span class="pl-c1">2</span>*<span class="pl-c1">time</span>.<span class="pl-smi">Second</span>)
+    fmt.<span class="pl-c1">Println</span>(i)
+}</pre></div>
+
+<p>输出结果：</p>
+
+<pre><code>0
+1
+2
+3
+4
+</code></pre>
+
+<p>上面的demo就是一个在四个协成中输出数字,注意如果没有在主协成中进行wait操作饿话是看不到输出结果的,
+原因就是此时main会早于协成的结束导致当前的会话关闭.</p>
+
+<p>其实除了上面这种方法来进行多协成之间的同步还可以使用chanel来进行控制.</p>
+
+<h1>
+<a id="欢迎一起交流学习-" class="anchor" href="#%E6%AC%A2%E8%BF%8E%E4%B8%80%E8%B5%B7%E4%BA%A4%E6%B5%81%E5%AD%A6%E4%B9%A0-" aria-hidden="true"><span class="octicon octicon-link"></span></a>欢迎一起交流学习 </h1>
+
+<p>在使用中有任何问题，欢迎反馈给我，可以用以下联系方式跟我交流</p>
+
+<ul>
+<li>邮件(1031379296#qq.com, 把#换成@)</li>
+<li>QQ: 1031379296</li>
+<li>weibo: <a href="http://weibo.com/u/2786211992/home">@王发康</a>
+</li>
+</ul>
+
+<h1>
+<a id="thx" class="anchor" href="#thx" aria-hidden="true"><span class="octicon octicon-link"></span></a>Thx</h1>
+
+<ul>
+<li>chunshengsterATgmail.com</li>
+</ul>
+
+<h1>
+<a id="author" class="anchor" href="#author" aria-hidden="true"><span class="octicon octicon-link"></span></a>Author</h1>
+
+<ul>
+<li>Linux\nginx\golang\c\c++爱好者</li>
+<li>欢迎一起交流  一起学习# </li>
+<li>Others say good and Others good</li>
+</ul>
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		          <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("goroutine wait golang多协成的wait操作管理");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
